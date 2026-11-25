@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MathDaily — Belajar Matematika SMP Kelas VII, VIII &amp; IX</title>
+  <!-- Google Fonts: Nunito & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Tone.js untuk Musik Latar Islami & Efek Suara -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Nunito', 'sans-serif'],
+          },
+          colors: {
+            skybrand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+            },
+            sunny: {
+              50: '#fefce8',
+              100: '#fef9c3',
+              300: '#fde047',
+              400: '#facc15',
+              500: '#eab308',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 40%, #fefce8 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Nunito', sans-serif;
+    }
+    /* Smooth Page Transitions */
+    .fade-in {
+      animation: fadeIn 0.35s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .pop-in {
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.88); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .float-slow {
+      animation: floatSlow 3.5s ease-in-out infinite;
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .highlight-pulse {
+      animation: highlightPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes highlightPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.45); }
+      50% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+    }
+    .strike-anim {
+      position: relative;
+      display: inline-block;
+    }
+    .strike-anim::after {
+      content: '';
+      position: absolute;
+      left: -4px;
+      right: -4px;
+      top: 50%;
+      height: 3px;
+      background: #ef4444;
+      border-radius: 2px;
+      transform: rotate(-8deg);
+      animation: strikeDraw 0.45s ease-out forwards;
+    }
+    @keyframes strikeDraw {
+      from { width: 0; }
+      to { width: calc(100% + 8px); }
+    }
+    /* Confetti Piece */
+    .confetti-piece {
+      position: fixed;
+      top: -12px;
+      width: 10px;
+      height: 14px;
+      border-radius: 3px;
+      z-index: 100;
+      pointer-events: none;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      to {
+        transform: translateY(105vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+  </style>
+</head>
+<body class="text-slate-800 pb-24 md:pb-10">
+
+  <!-- ==================== TOAST NOTIFICATION ==================== -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-xs sm:max-w-sm pointer-events-none"></div>
+
+  <!-- ==================== ONBOARDING / EDIT PROFILE MODAL ==================== -->
+  <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gradient-to-br from-sky-500/95 via-sky-400/95 to-amber-200/95 backdrop-blur-md p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 pop-in border-2 border-sky-100">
+      <div class="text-center mb-6">
+        <div class="w-24 h-24 mx-auto mb-2 float-slow">
+          <!-- Ilustrasi Kartun Siswi Berhijab Islami -->
+          <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow-md" aria-label="Karakter Siswi Berhijab MathDaily">
+            <circle cx="60" cy="60" r="56" fill="#e0f2fe" stroke="#bae6fd" stroke-width="3"/>
+            <!-- Hijab Luar -->
+            <path d="M25 65 C25 28, 95 28, 95 65 C98 92, 86 108, 60 108 C34 108, 22 92, 25 65 Z" fill="#0ea5e9"/>
+            <!-- Lipatan Hijab -->
+            <path d="M32 62 C32 34, 88 34, 88 62 C88 85, 76 96, 60 96 C44 96, 32 85, 32 62 Z" fill="#38bdf8"/>
+            <!-- Wajah -->
+            <ellipse cx="60" cy="62" rx="22" ry="25" fill="#fde6d8"/>
+            <!-- Ciput / Inner Hijab -->
+            <path d="M38 56 C40 40, 80 40, 82 56 C74 48, 46 48, 38 56 Z" fill="#fef08a"/>
+            <!-- Mata & Alis -->
+            <path d="M47 54 Q51 51 55 54" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M65 54 Q69 51 73 54" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="51" cy="60" r="2.8" fill="#1e293b"/>
+            <circle cx="69" cy="60" r="2.8" fill="#1e293b"/>
+            <circle cx="52" cy="59" r="1" fill="#ffffff"/>
+            <circle cx="70" cy="59" r="1" fill="#ffffff"/>
+            <!-- Pipi Merona -->
+            <ellipse cx="45" cy="66" rx="4" ry="2.2" fill="#fda4af" opacity="0.7"/>
+            <ellipse cx="75" cy="66" rx="4" ry="2.2" fill="#fda4af" opacity="0.7"/>
+            <!-- Senyum Ramah -->
+            <path d="M54 71 Q60 77 66 71" stroke="#e11d48" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+            <!-- Pin Bros Bulan Sabit & Bintang -->
+            <circle cx="60" cy="91" r="4.5" fill="#facc15" stroke="#ffffff" stroke-width="1.2"/>
+            <!-- Baju Seragam Muslimah -->
+            <path d="M34 108 C38 97, 82 97, 86 108 Z" fill="#fef9c3"/>
+          </svg>
+        </div>
+        <span class="inline-block px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold mb-1">Assalamu’alaikum Warahmatullahi Wabarakatuh</span>
+        <h2 id="profile-modal-title" class="text-2xl font-extrabold text-slate-800">Selamat Datang di MathDaily!</h2>
+        <p class="text-sm text-slate-500 mt-1">Isi identitasmu dulu yuk agar pengalaman belajarmu makin seru.</p>
+      </div>
+      <form id="profile-form" class="space-y-4">
+        <div>
+          <label for="input-name" class="block text-sm font-bold text-slate-700 mb-1.5">Nama Lengkap Siswa <span class="text-rose-500">*</span></label>
+          <input type="text" id="input-name" placeholder="Contoh: Aulia Rahma" maxlength="40"
+            class="w-full px-4 py-3 rounded-2xl border-2 border-sky-100 focus:border-sky-400 focus:outline-none text-slate-800 bg-sky-50/40 font-medium transition" />
+          <p id="name-error" class="text-xs text-rose-500 font-semibold mt-1 hidden">Nama lengkap wajib diisi ya!</p>
+        </div>
+        <div>
+          <label for="input-grade" class="block text-sm font-bold text-slate-700 mb-1.5">Tingkatan / Kelas</label>
+          <select id="input-grade"
+            class="w-full px-4 py-3 rounded-2xl border-2 border-sky-100 focus:border-sky-400 focus:outline-none text-slate-800 bg-sky-50/40 font-medium transition">
+            <option value="Kelas VII">Kelas VII</option>
+            <option value="Kelas VIII">Kelas VIII</option>
+            <option value="Kelas IX">Kelas IX</option>
+          </select>
+        </div>
+        <div class="pt-2 flex gap-3">
+          <button type="button" id="btn-cancel-profile" class="hidden flex-1 py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">
+            Batal
+          </button>
+          <button type="submit" class="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold shadow-md hover:shadow-lg transition">
+            Simpan &amp; Mulai <i class="fa-solid fa-arrow-right ml-1"></i>
+          </button>
+        </div>
+      </form>
+      <p class="text-[11px] text-center text-slate-400 mt-4">
+        <i class="fa-solid fa-shield-halved mr-1"></i>Tanpa kata sandi. Identitas disimpan aman di browser perangkat ini.
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== CUSTOM CONFIRM / INFO MODAL ==================== -->
+  <div id="custom-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 pop-in border-2 border-amber-100 text-center">
+      <div id="custom-modal-icon" class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 text-amber-500 flex items-center justify-center text-2xl mb-3">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <h3 id="custom-modal-title" class="text-xl font-extrabold text-slate-800 mb-2">Informasi</h3>
+      <p id="custom-modal-message" class="text-sm text-slate-600 mb-6 leading-relaxed"></p>
+      <div id="custom-modal-actions" class="flex gap-3 justify-center"></div>
+    </div>
+  </div>
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-sky-100 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
+      <!-- Brand Logo -->
+      <button onclick="navigateTo('home')" class="flex items-center gap-2.5 text-left group focus:outline-none">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition">
+          <i class="fa-solid fa-calculator text-lg"></i>
+        </div>
+        <div>
+          <span class="font-display font-black text-xl tracking-tight text-sky-600">Math<span class="text-amber-500">Daily</span></span>
+          <span class="hidden sm:block text-[10px] font-semibold text-slate-400 -mt-1">Matematika Kelas VII, VIII &amp; IX SMP</span>
+        </div>
+      </button>
+
+      <!-- Desktop Menu -->
+      <nav class="hidden lg:flex items-center gap-1 bg-sky-50/80 p-1.5 rounded-2xl border border-sky-100">
+        <button data-nav="home" onclick="navigateTo('home')" class="nav-btn px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-house"></i> Beranda
+        </button>
+        <button data-nav="materi" onclick="navigateTo('materi')" class="nav-btn px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-book-open"></i> Materi
+        </button>
+        <button data-nav="animasi" onclick="navigateTo('animasi')" class="nav-btn px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Animasi
+        </button>
+        <button data-nav="latihan" onclick="navigateTo('latihan')" class="nav-btn px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-pen-to-square"></i> Latihan Soal
+        </button>
+        <button data-nav="progress" onclick="navigateTo('progress')" class="nav-btn px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-chart-line"></i> Perkembangan
+        </button>
+        <button data-nav="profil" onclick="openProfileModal(true)" class="nav-btn px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition flex items-center gap-1.5 text-slate-600 hover:bg-sky-100">
+          <i class="fa-solid fa-user"></i> Profil
+        </button>
+      </nav>
+
+      <!-- Right Status: Music Player, Streak & Student Profile -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button id="btn-music-toggle" onclick="toggleIslamicMusic()" title="Putar / Jeda Musik Latar Islami" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-extrabold text-xs sm:text-sm hover:bg-emerald-100 transition">
+          <i id="music-icon" class="fa-solid fa-music"></i>
+          <span id="music-label" class="hidden md:inline">Musik</span>
+        </button>
+        <button onclick="navigateTo('progress')" title="Lihat Daily Streak" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 font-extrabold text-xs sm:text-sm hover:bg-amber-100 transition">
+          <span>🔥</span>
+          <span id="header-streak">0</span>
+          <span class="hidden sm:inline text-xs font-bold">Hari</span>
+        </button>
+        <button onclick="openProfileModal(true)" title="Ubah Profil Siswa" class="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-sky-50 border border-sky-200 hover:bg-sky-100 transition max-w-[140px] sm:max-w-[200px]">
+          <div class="w-7 h-7 rounded-xl bg-sky-500 text-white font-extrabold text-xs flex items-center justify-center shrink-0" id="header-avatar">S</div>
+          <div class="text-left truncate">
+            <p id="header-name" class="text-xs font-extrabold text-slate-800 truncate">Siswa</p>
+            <p id="header-grade" class="text-[10px] font-semibold text-sky-600 truncate">Kelas VIII</p>
+          </div>
+          <i class="fa-solid fa-pen text-[10px] text-slate-400 hidden sm:inline"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MOBILE BOTTOM NAVIGATION ==================== -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-sky-100 shadow-[0_-4px_20px_rgba(14,165,233,0.08)] px-1.5 py-1.5">
+    <div class="grid grid-cols-6 gap-0.5">
+      <button data-nav="home" onclick="navigateTo('home')" class="nav-btn-mobile flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-bold transition">
+        <i class="fa-solid fa-house text-sm mb-0.5"></i>
+        <span>Beranda</span>
+      </button>
+      <button data-nav="materi" onclick="navigateTo('materi')" class="nav-btn-mobile flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-bold transition">
+        <i class="fa-solid fa-book-open text-sm mb-0.5"></i>
+        <span>Materi</span>
+      </button>
+      <button data-nav="animasi" onclick="navigateTo('animasi')" class="nav-btn-mobile flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-bold transition">
+        <i class="fa-solid fa-wand-magic-sparkles text-sm mb-0.5"></i>
+        <span>Animasi</span>
+      </button>
+      <button data-nav="latihan" onclick="navigateTo('latihan')" class="nav-btn-mobile flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-bold transition">
+        <i class="fa-solid fa-pen-to-square text-sm mb-0.5"></i>
+        <span>Latihan</span>
+      </button>
+      <button data-nav="progress" onclick="navigateTo('progress')" class="nav-btn-mobile flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-bold transition">
+        <i class="fa-solid fa-chart-line text-sm mb-0.5"></i>
+        <span>Progres</span>
+      </button>
+      <button data-nav="profil" onclick="openProfileModal(true)" class="nav-btn-mobile flex flex-col items-center justify-center py-1.5 rounded-xl text-[10px] font-bold transition text-slate-500">
+        <i class="fa-solid fa-user text-sm mb-0.5"></i>
+        <span>Profil</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+  <main id="app-main" class="max-w-6xl mx-auto px-4 pt-6 sm:pt-8">
+    <!-- Dynamic Views Rendered Here -->
+  </main>
+
+  <!-- ==================== JAVASCRIPT APPLICATION ==================== -->
+  <script>
+    // =========================================================================
+    // 1. CONSTANTS, STORAGE & INITIAL STATE
+    // =========================================================================
+    const STORAGE_KEY = 'mathdaily_smp_789_v3';
+
+    const GRADES = ['Kelas VII', 'Kelas VIII', 'Kelas IX'];
+
+    const TOPICS = {
+      aljabar: {
+        id: 'aljabar',
+        grade: 'Kelas VII',
+        name: 'Aljabar',
+        shortName: 'Aljabar',
+        icon: 'fa-x',
+        desc: 'Memahami variabel, koefisien, konstanta, suku sejenis, serta operasi hitung bentuk aljabar.',
+        cta: 'Mulai Belajar Aljabar',
+        accent: 'emerald'
+      },
+      rasio: {
+        id: 'rasio',
+        grade: 'Kelas VII',
+        name: 'Rasio dan Perbandingan',
+        shortName: 'Rasio & Perbandingan',
+        icon: 'fa-scale-unbalanced',
+        desc: 'Menyederhanakan rasio, perbandingan senilai, berbalik nilai, serta menghitung skala peta.',
+        cta: 'Mulai Belajar Rasio',
+        accent: 'teal'
+      },
+      spldv: {
+        id: 'spldv',
+        grade: 'Kelas VIII',
+        name: 'Sistem Persamaan Linear Dua Variabel (SPLDV)',
+        shortName: 'SPLDV',
+        icon: 'fa-equals',
+        desc: 'Menyelesaikan dua persamaan linear dua variabel dengan metode eliminasi, substitusi, dan soal cerita.',
+        cta: 'Mulai Belajar SPLDV',
+        accent: 'sky'
+      },
+      pola: {
+        id: 'pola',
+        grade: 'Kelas VIII',
+        name: 'Pola Bilangan dan Barisan/Deret',
+        shortName: 'Pola Bilangan',
+        icon: 'fa-grip',
+        desc: 'Mengenali pola bilangan khusus, barisan & deret aritmetika maupun geometri dalam kehidupan sehari-hari.',
+        cta: 'Mulai Belajar Pola Bilangan',
+        accent: 'amber'
+      },
+      kuadrat: {
+        id: 'kuadrat',
+        grade: 'Kelas IX',
+        name: 'Persamaan dan Fungsi Kuadrat',
+        shortName: 'Persamaan & Fungsi Kuadrat',
+        icon: 'fa-wave-square',
+        desc: 'Menentukan akar persamaan kuadrat, diskriminan, sumbu simetri, dan titik puncak grafik parabola.',
+        cta: 'Mulai Belajar Kuadrat',
+        accent: 'violet'
+      },
+      pangkat: {
+        id: 'pangkat',
+        grade: 'Kelas IX',
+        name: 'Bilangan Berpangkat',
+        shortName: 'Bilangan Berpangkat',
+        icon: 'fa-superscript',
+        desc: 'Memahami pangkat positif, pangkat nol, pangkat negatif, notasi ilmiah, dan sifat operasi eksponen.',
+        cta: 'Mulai Belajar Pangkat',
+        accent: 'rose'
+      },
+      akar: {
+        id: 'akar',
+        grade: 'Kelas IX',
+        name: 'Bentuk Akar',
+        shortName: 'Bentuk Akar',
+        icon: 'fa-square-root-variable',
+        desc: 'Menyederhanakan bentuk akar, operasi hitung bentuk akar, dan merasionalkan penyebut pecahan.',
+        cta: 'Mulai Belajar Bentuk Akar',
+        accent: 'indigo'
+      }
+    };
+
+    const MOTIVATIONS = [
+      'Tidak harus langsung bisa, yang penting terus mencoba!',
+      'Sedikit demi sedikit, lama-lama kamu pasti mengerti.',
+      'Kesalahan adalah bagian dari proses belajar.',
+      'Hebat! Kamu sudah menyelesaikan tantangan hari ini.',
+      'Terus berlatih, karena matematika akan semakin mudah jika dibiasakan.'
+    ];
+
+    const ERROR_CATEGORIES = [
+      // Aljabar (Kelas VII)
+      { id: 'alj_variabel', label: 'Aljabar: Kesalahan mengenali variabel', materialId: 'alj_1' },
+      { id: 'alj_koefisien', label: 'Aljabar: Kesalahan menentukan koefisien & konstanta', materialId: 'alj_1' },
+      { id: 'alj_operasi', label: 'Aljabar: Kesalahan mengoperasikan bentuk aljabar', materialId: 'alj_2' },
+      // Rasio (Kelas VII)
+      { id: 'ras_sederhana', label: 'Rasio: Kesalahan menyederhanakan rasio', materialId: 'ras_1' },
+      { id: 'ras_senilai', label: 'Rasio: Kesalahan membedakan perbandingan senilai & berbalik nilai', materialId: 'ras_1' },
+      { id: 'ras_skala', label: 'Rasio: Kesalahan menentukan skala & jarak sebenarnya', materialId: 'ras_2' },
+      // SPLDV (Kelas VIII)
+      { id: 'spldv_konsep', label: 'SPLDV: Kesalahan memahami konsep & unsur SPLDV', materialId: 'spldv_1' },
+      { id: 'spldv_eliminasi', label: 'SPLDV: Kesalahan metode eliminasi', materialId: 'spldv_2' },
+      { id: 'spldv_substitusi', label: 'SPLDV: Kesalahan metode substitusi', materialId: 'spldv_2' },
+      { id: 'spldv_model', label: 'SPLDV: Kesalahan membuat model matematika soal cerita', materialId: 'spldv_3' },
+      // Pola Bilangan (Kelas VIII)
+      { id: 'pola_kenal', label: 'Pola Bilangan: Kesalahan mengenali pola & beda barisan', materialId: 'pola_1' },
+      { id: 'pola_rasio', label: 'Pola Bilangan: Kesalahan menentukan rasio barisan geometri', materialId: 'pola_2' },
+      { id: 'pola_rumus', label: 'Pola Bilangan: Kesalahan menggunakan rumus Un & jumlah deret Sn', materialId: 'pola_2' },
+      // Persamaan & Fungsi Kuadrat (Kelas IX)
+      { id: 'kua_konsep', label: 'Kuadrat: Kesalahan bentuk umum & diskriminan persamaan kuadrat', materialId: 'kua_1' },
+      { id: 'kua_akar', label: 'Kuadrat: Kesalahan menentukan akar dengan pemfaktoran / rumus ABC', materialId: 'kua_1' },
+      { id: 'kua_grafik', label: 'Kuadrat: Kesalahan membaca grafik & titik puncak fungsi kuadrat', materialId: 'kua_2' },
+      // Bilangan Berpangkat (Kelas IX)
+      { id: 'pkt_sifat', label: 'Bilangan Berpangkat: Kesalahan sifat perkalian & pembagian pangkat', materialId: 'pkt_1' },
+      { id: 'pkt_negatif', label: 'Bilangan Berpangkat: Kesalahan memahami pangkat nol & pangkat negatif', materialId: 'pkt_1' },
+      // Bentuk Akar (Kelas IX)
+      { id: 'akr_sederhana', label: 'Bentuk Akar: Kesalahan menyederhanakan bentuk akar', materialId: 'akr_1' },
+      { id: 'akr_operasi', label: 'Bentuk Akar: Kesalahan operasi penjumlahan & perkalian bentuk akar', materialId: 'akr_1' },
+      { id: 'akr_rasional', label: 'Bentuk Akar: Kesalahan merasionalkan penyebut', materialId: 'akr_1' }
+    ];
+
+    const STREAK_AWARDS = [
+      { days: 3, name: 'Bintang Pemula', icon: '⭐', color: 'bg-sky-100 text-sky-800 border-sky-300' },
+      { days: 5, name: 'Pejuang Konsisten', icon: '🔥', color: 'bg-amber-100 text-amber-800 border-amber-300' },
+      { days: 7, name: 'MathDaily Champion', icon: '🏅', color: 'bg-emerald-100 text-emerald-800 border-emerald-300' },
+      { days: 14, name: 'Master Belajar', icon: '👑', color: 'bg-violet-100 text-violet-800 border-violet-300' },
+      { days: 30, name: 'MathDaily Legend', icon: '💎', color: 'bg-rose-100 text-rose-800 border-rose-300' }
+    ];
+
+    function getLocalDateKey(dateObj = new Date()) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function calculateStreak(datesArr) {
+      if (!Array.isArray(datesArr) || datesArr.length === 0) return 0;
+      const uniqueDates = Array.from(new Set(datesArr)).sort().reverse();
+      const today = new Date();
+      const todayKey = getLocalDateKey(today);
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      const yesterdayKey = getLocalDateKey(yesterday);
+
+      if (uniqueDates[0] !== todayKey && uniqueDates[0] !== yesterdayKey) {
+        return 0;
+      }
+
+      let streak = 0;
+      let cursor = uniqueDates[0] === todayKey ? new Date(today) : new Date(yesterday);
+      const dateSet = new Set(uniqueDates);
+
+      while (dateSet.has(getLocalDateKey(cursor))) {
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      return streak;
+    }
+
+    function recordDailyActivity(type) {
+      const todayKey = getLocalDateKey();
+      if (!appState.dailyTargets || appState.dailyTargets.date !== todayKey) {
+        appState.dailyTargets = {
+          date: todayKey,
+          studiedMaterial: false,
+          completedQuiz: false,
+          earnedAchievement: false
+        };
+      }
+      if (type === 'material') appState.dailyTargets.studiedMaterial = true;
+      if (type === 'quiz') appState.dailyTargets.completedQuiz = true;
+      if (type === 'achievement') appState.dailyTargets.earnedAchievement = true;
+
+      if (!appState.activityDates.includes(todayKey)) {
+        appState.activityDates.push(todayKey);
+      }
+      saveState();
+    }
+
+    function viewHistoryResult(historyId) {
+      const found = appState.quizHistory.find(h => h.id === historyId);
+      if (!found) {
+        showToast('Riwayat kuis tidak ditemukan.', 'warning');
+        return;
+      }
+      quizRuntime.lastResult = found;
+      currentView = 'quiz_result';
+      renderQuizResult();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getHijabiMascotSVG(sizeClass = 'w-32 h-32 mx-auto', caption = '') {
+      return `
+        <div class="text-center">
+          <svg viewBox="0 0 120 120" class="${sizeClass} drop-shadow-md" aria-label="Karakter Siswi Berhijab MathDaily">
+            <circle cx="60" cy="60" r="56" fill="#e0f2fe" stroke="#bae6fd" stroke-width="3"/>
+            <path d="M25 65 C25 28, 95 28, 95 65 C98 92, 86 108, 60 108 C34 108, 22 92, 25 65 Z" fill="#0ea5e9"/>
+            <path d="M32 62 C32 34, 88 34, 88 62 C88 85, 76 96, 60 96 C44 96, 32 85, 32 62 Z" fill="#38bdf8"/>
+            <ellipse cx="60" cy="62" rx="22" ry="25" fill="#fde6d8"/>
+            <path d="M38 56 C40 40, 80 40, 82 56 C74 48, 46 48, 38 56 Z" fill="#fef08a"/>
+            <path d="M47 54 Q51 51 55 54" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M65 54 Q69 51 73 54" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="51" cy="60" r="2.8" fill="#1e293b"/>
+            <circle cx="69" cy="60" r="2.8" fill="#1e293b"/>
+            <circle cx="52" cy="59" r="1" fill="#ffffff"/>
+            <circle cx="70" cy="59" r="1" fill="#ffffff"/>
+            <ellipse cx="45" cy="66" rx="4" ry="2.2" fill="#fda4af" opacity="0.7"/>
+            <ellipse cx="75" cy="66" rx="4" ry="2.2" fill="#fda4af" opacity="0.7"/>
+            <path d="M54 71 Q60 77 66 71" stroke="#e11d48" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+            <circle cx="60" cy="91" r="4.5" fill="#facc15" stroke="#ffffff" stroke-width="1.2"/>
+            <path d="M34 108 C38 97, 82 97, 86 108 Z" fill="#fef9c3"/>
+          </svg>
+          ${caption ? `<p class="text-xs font-extrabold text-white mt-1.5 drop-shadow-sm">${escapeHtml(caption)}</p>` : ''}
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // ISLAMIC BACKGROUND MUSIC & SOUND EFFECTS ENGINE (TONE.JS)
+    // =========================================================================
+    let isMusicPlaying = false;
+    let musicLoop = null;
+    let musicSynth = null;
+
+    async function toggleIslamicMusic() {
+      const btn = document.getElementById('btn-music-toggle');
+      const icon = document.getElementById('music-icon');
+      const label = document.getElementById('music-label');
+
+      try {
+        if (typeof Tone === 'undefined') {
+          showToast('Fitur audio sedang dimuat, coba sebentar lagi.', 'warning');
+          return;
+        }
+        if (isMusicPlaying) {
+          if (musicLoop) musicLoop.stop();
+          Tone.Transport.stop();
+          isMusicPlaying = false;
+          if (btn) btn.className = 'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-extrabold text-xs sm:text-sm hover:bg-emerald-100 transition';
+          if (icon) icon.className = 'fa-solid fa-music';
+          if (label) label.textContent = 'Musik';
+          showToast('Musik latar dijeda.', 'info');
+          return;
+        }
+
+        await Tone.start();
+        if (!musicSynth) {
+          musicSynth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'triangle' },
+            envelope: { attack: 0.08, decay: 0.25, sustain: 0.3, release: 0.9 }
+          }).toDestination();
+          musicSynth.volume.value = -14;
+
+          const hijazNotes = ['D4', 'Eb4', 'F#4', 'G4', 'A4', 'Bb4', 'A4', 'G4', 'F#4', 'Eb4', 'D4', null];
+          let step = 0;
+          musicLoop = new Tone.Loop((time) => {
+            const note = hijazNotes[step % hijazNotes.length];
+            if (note) {
+              musicSynth.triggerAttackRelease(note, '8n', time);
+            }
+            step++;
+          }, '4n');
+        }
+
+        Tone.Transport.bpm.value = 92;
+        musicLoop.start(0);
+        Tone.Transport.start();
+        isMusicPlaying = true;
+        if (btn) btn.className = 'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-emerald-500 border border-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-sm transition';
+        if (icon) icon.className = 'fa-solid fa-volume-high animate-pulse';
+        if (label) label.textContent = 'Aktif';
+        showToast('Musik latar islami diputar.', 'success');
+      } catch (err) {
+        showToast('Klik layar sekali lagi untuk mengaktifkan audio.', 'info');
+      }
+    }
+
+    function playFeedbackTone(isCorrect) {
+      try {
+        if (typeof Tone === 'undefined') return;
+        const sfx = new Tone.Synth().toDestination();
+        sfx.volume.value = -10;
+        if (isCorrect) {
+          sfx.triggerAttackRelease('C5', '16n');
+          setTimeout(() => sfx.triggerAttackRelease('E5', '16n'), 90);
+          setTimeout(() => sfx.triggerAttackRelease('G5', '8n'), 180);
+        } else {
+          sfx.triggerAttackRelease('E4', '16n');
+          setTimeout(() => sfx.triggerAttackRelease('C4', '8n'), 120);
+        }
+      } catch (e) {}
+    }
+
+    function getDefaultState() {
+// ... existing code ... -->
